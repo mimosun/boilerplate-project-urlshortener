@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const cors = require('cors');
+const dns = require('dns');
 const app = express();
 
 // Basic Configuration
@@ -44,9 +45,14 @@ app.get('/api/shorturl/:id', function(req, res) {
 
 app.post('/api/shorturl', function(req, res) {
   try {
-    new URL(req.body.url);
+    const urlObject = new URL(req.body.url);
+    dns.lookup(urlObject.hostname, function (err, address, family) {
+      if (err !== null) {
+        throw err;
+      }
+    });
   } catch (e) {
-    res.json({ error: 'invalid url' });
+    res.json({ error: 'Invalid URL' });
     return
   }
 
