@@ -26,14 +26,14 @@ app.get('/api/hello', function(req, res) {
 app.get('/api/shorturl/:id', async function(req, res) {
   if (!req.params.id || isNaN(req.params.id)) {
     res.json({ error: 'Wrong format' });
-    return
+    return;
   }
-
-  const data = await mongo.findData({short_url: parseInt(req.params.id)});
+  
+  const data = await mongo.findData({ short_url: parseInt(req.params.id) });
   
   if (!data.original_url) {
     res.json({ error: 'No short URL found for the given input' });
-    return
+    return;
   }
 
   res.redirect(data.original_url);
@@ -42,19 +42,20 @@ app.get('/api/shorturl/:id', async function(req, res) {
 app.post('/api/shorturl', async function(req, res) {
   try {
     const urlObject = new URL(req.body.url);
-    dns.lookup(urlObject.hostname, function (err, address, family) {
-      if (err !== null) {
-        throw err;
+    await dns.lookup(urlObject.hostname, function(err) {
+      if (err) {
+        res.json({ error: 'Invalid Url' });
+        return;
       }
     });
   } catch (e) {
-    res.json({ error: 'Invalid URL' });
+    res.json({ error: 'Invalid Url' });
     return
   }
 
   let shortUrl = 1;
-  const data = await mongo.findLastData({short_url: -1});
-  
+  const data = await mongo.findLastData({ short_url: -1 });
+
   if (data && data.short_url) {
     shortUrl = parseInt(data.short_url) + 1;
   }
@@ -64,7 +65,7 @@ app.post('/api/shorturl', async function(req, res) {
     short_url: shortUrl
   };
 
-  mongo.saveData(output);
+  await mongo.saveData(output);
 
   res.json(output);
 });

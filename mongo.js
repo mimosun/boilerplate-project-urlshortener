@@ -20,7 +20,7 @@ async function run() {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 
@@ -31,7 +31,7 @@ async function saveData(data) {
     await client.connect();
     await client.db(dbName).collection(dbCollect).insertOne(data);
   } finally {
-    await client.close();
+    // await client.close();
   }
 }
 
@@ -41,7 +41,7 @@ async function findData(filter = {}) {
     const data = await client.db(dbName).collection(dbCollect).find(filter).limit(1).toArray();
     return data.length ? data[0] : null;
   } finally {
-    await client.close();
+    // await client.close();
   }
 }
 
@@ -51,7 +51,7 @@ async function findLastData(sort = {}) {
     const data = await client.db(dbName).collection(dbCollect).find().sort(sort).limit(1).toArray();
     return data.length ? data[0] : null;
   } finally {
-    await client.close();
+    // await client.close();
   }
 }
 
